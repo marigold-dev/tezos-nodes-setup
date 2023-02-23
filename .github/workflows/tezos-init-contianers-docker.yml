@@ -1,0 +1,90 @@
+name: Tezos Init Containers CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        default: 'release'
+        description: 'Tezos image version or tag'
+  repository_dispatch:
+      types: [from-k8s-cronjob]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.event_name == 'repository_dispatch'
+        run: |
+            VERSION=${{ toJson(github.event.client_payload.version) }}
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "Pipeline has been triggered using HTTP. Setting version variable to $VERSION"
+        env:
+          VERSION: ${{ toJson(github.event.client_payload.version) }}
+      - if: github.event_name == 'workflow_dispatch'
+        run: |
+            VERSION=${{ github.event.inputs.version }}
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
+            echo "Pipeline has been triggered manually. Setting version variable to $VERSION"
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push tezos Node Configurator
+        id: docker_build_tezos_node_configurator
+        uses: docker/build-push-action@v2
+        with:
+          context: ./node-configurator
+          platforms: linux/amd64
+          build-args: |
+            VERSION=${{ env.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          tags: |
+            ghcr.io/marigold-dev/tezos-node-configurator:${{ env.VERSION }}
+            ghcr.io/marigold-dev/tezos-node-configurator:${{ github.sha }}
+            ghcr.io/marigold-dev/tezos-node-configurator:latest
+
+      - name: Build and push tezos Snapshot Downloader
+        id: docker_build_tezos_snapshot_downloader
+        uses: docker/build-push-action@v2
+        with:
+          context: ./snapshot-downloader
+          platforms: linux/amd64
+          build-args: |
+            VERSION=${{ env.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          tags: |
+            ghcr.io/marigold-dev/tezos-snapshot-downloader:${{ env.VERSION }}
+            ghcr.io/marigold-dev/tezos-snapshot-downloader:latest
+
+      - name: Build and push tezos Storage Upgrader
+        id: docker_build_tezos_storage_upgrader
+        uses: docker/build-push-action@v2
+        with:
+          context: ./storage-upgrader
+          platforms: linux/amd64
+          build-args: |
+            VERSION=${{ env.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          push: true
+          tags: |
+            ghcr.io/marigold-dev/tezos-storage-upgrader:${{ env.VERSION }}
+            ghcr.io/marigold-dev/tezos-storage-upgrader:latest
+

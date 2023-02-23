@@ -1,0 +1,55 @@
+name: Tezos Docker CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      repository:
+        required: true
+        default: 'https://gitlab.com/tezos/tezos.git'
+        description: 'https://gitlab.com/tezos/tezos.git | https://gitlab.com/marigold/tezos.git'
+      profile:
+        required: true
+        default: 'dev'
+        description: 'dev | master | static'
+      version:
+        required: true
+        default: 'master'
+        description: 'commit or branch from Tezos'
+      build:
+        required: true
+        default: 'build'
+        description: 'build | build-unreleased'
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1 
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push tezos
+        id: docker_build_tezos
+        uses: docker/build-push-action@v2
+        with:
+          context: ./tezos
+          platforms: linux/amd64
+          build-args: |
+            PROFILE=${{ github.event.inputs.profile }}
+            VERSION=${{ github.event.inputs.version }}
+            REPOSITORY=${{ github.event.inputs.repository }}
+            BUILD=${{ github.event.inputs.build }}
+          push: true
+          tags: |
+            ghcr.io/marigold-dev/tezos:${{ github.event.inputs.profile }}-${{ github.event.inputs.version }}-${{ github.event.inputs.build }}-latest
+            ghcr.io/marigold-dev/tezos:${{ github.sha }}
+
