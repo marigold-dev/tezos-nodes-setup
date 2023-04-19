@@ -1,6 +1,18 @@
 #!/bin/sh
 set -ex
 
+# throw error if TEZOS_NETWORK and HISTORY_MODE are not set
+if [ -z "$TEZOS_NETWORK" ]; then
+    echo "TEZOS_NETWORK is not set"
+    exit 1
+fi
+if [ -z "$HISTORY_MODE" ]; then
+    echo "HISTORY_MODE is not set"
+    exit 1
+fi
+
+
+CORS_ENABLED=${CORS_ENABLED:-true}
 bin_dir="/usr/local/bin"
 data_dir="/var/run/tezos"
 node_dir="$data_dir/node"
@@ -29,12 +41,8 @@ cat << EOF > ${node_dir}/data/config.json
   "rpc":
     {
       "listen-addrs": [ "0.0.0.0:8732", ":8732"],
-      "cors-origin": [
-          "*"
-      ],
-      "cors-headers": [
-          "Content-Type"
-      ],
+      $([ "$CORS_ENABLED" = true ] && echo '"cors-origin": ["*"],
+      "cors-headers": ["Content-Type"],')
       "acl":
         [ { "address": "0.0.0.0:8732", "blacklist": [] }, { "address": "127.0.0.1:8732", "blacklist": [] }
         ]
