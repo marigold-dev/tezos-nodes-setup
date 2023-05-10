@@ -30,13 +30,13 @@ jobs:
           VERSION: ${{ github.event.inputs.version }}
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+        uses: docker/setup-buildx-action@v2
 
       - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1 
+        uses: docker/login-action@v2 
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -44,7 +44,7 @@ jobs:
 
       - name: Build and push tezos Node Configurator
         id: docker_build_tezos_node_configurator
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: ./node-configurator
           platforms: linux/amd64
@@ -60,7 +60,7 @@ jobs:
 
       - name: Build and push tezos Snapshot Downloader
         id: docker_build_tezos_snapshot_downloader
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: ./snapshot-downloader
           platforms: linux/amd64
@@ -75,7 +75,7 @@ jobs:
 
       - name: Build and push tezos Storage Upgrader
         id: docker_build_tezos_storage_upgrader
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v3
         with:
           context: ./storage-upgrader
           platforms: linux/amd64
