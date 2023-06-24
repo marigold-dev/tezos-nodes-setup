@@ -21,7 +21,7 @@ else
     snapshot_file=${node_dir}/chain.snapshot
     [ -f "${node_data_dir}/lock" ] && rm ${node_data_dir}/lock
     curl -L -o $snapshot_file $SNAPSHOT_URL
-    exec "${node}" snapshot import ${snapshot_file} --data-dir ${node_data_dir} --config-file ${node_data_dir}/config.json
+    exec "${node}" snapshot import ${snapshot_file} --data-dir ${node_data_dir} --config-file ${node_data_dir}/config.json --no-check
     find ${node_dir}
     rm -rvf ${snapshot_file}
     exit 0
