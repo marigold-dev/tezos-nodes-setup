@@ -11,6 +11,14 @@ if [ -z "$HISTORY_MODE" ]; then
     exit 1
 fi
 
+CONNECTION_TIMEOUT=${CONNECTION_TIMEOUT:=10}
+MIN_CONNECTIONS=${MIN_CONNECTIONS:=25}
+MAX_CONNECTIONS=${MAX_CONNECTIONS:=75}
+MAX_KNOWN_POINTS_MAX=${MAX_KNOWN_POINTS_MAX:=400}
+MAX_KNOWN_POINTS_TARGET=${MAX_KNOWN_POINTS_TARGET:=300}
+MAX_KNOWN_PEER_IDS_MAX=${MAX_KNOWN_PEER_IDS_MAX:=400}
+MAX_KNOWN_PEER_IDS_TARGET=${MAX_KNOWN_PEER_IDS_TARGET:=300}
+SYNCHRONISATION_THRESHOLD=${SYNCHRONISATION_THRESHOLD:=1}
 
 CORS_ENABLED=${CORS_ENABLED:-true}
 bin_dir="/usr/local/bin"
@@ -47,13 +55,22 @@ cat << EOF > ${node_dir}/data/config.json
         [ { "address": "0.0.0.0:8732", "blacklist": [] }, { "address": "127.0.0.1:8732", "blacklist": [] }
         ]
     },
-  "p2p":
-    { "limits":
-        { "connection-timeout": 10, "min-connections": 25,
-          "max-connections": 75, "max_known_points": [ 400, 300 ],
-          "max_known_peer_ids": [ 400, 300 ] } },
-  "shell": { "chain_validator": { "bootstrap_threshold": 1 },
-             "history_mode": "$HISTORY_MODE" } }
+  "p2p":{
+    "limits":{
+      "connection-timeout":$CONNECTION_TIMEOUT,
+      "min-connections":$MIN_CONNECTIONS,
+      "max-connections":$MAX_CONNECTIONS,
+      "max_known_points":[$MAX_KNOWN_POINTS_MAX, $MAX_KNOWN_POINTS_TARGET],
+      "max_known_peer_ids":[$MAX_KNOWN_PEER_IDS_MAX, $MAX_KNOWN_PEER_IDS_TARGET]
+    }
+  },
+  "shell":{
+    "chain_validator":{
+      "synchronisation_threshold":$SYNCHRONISATION_THRESHOLD
+    },
+    "history_mode":"$HISTORY_MODE"
+  }
+}
 EOF
 
 cat ${node_dir}/data/config.json
