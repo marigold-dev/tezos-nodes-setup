@@ -32,6 +32,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Set outputs
+        id: vars
+        run: |
+          echo "date=$(date +%Y-%m-%dT%H-%M-%S)" >> "${GITHUB_OUTPUT}"
+          echo "sha_short=$(git rev-parse --short HEAD)" >> "${GITHUB_OUTPUT}"
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
@@ -56,6 +62,7 @@ jobs:
           tags: |
             ghcr.io/marigold-dev/tezos-node-configurator:${{ env.VERSION }}
             ghcr.io/marigold-dev/tezos-node-configurator:latest
+            ghcr.io/marigold-dev/tezos-node-configurator:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}
 
       - name: Build and push tezos Snapshot Downloader
         id: docker_build_tezos_snapshot_downloader
@@ -71,6 +78,7 @@ jobs:
           tags: |
             ghcr.io/marigold-dev/tezos-snapshot-downloader:${{ env.VERSION }}
             ghcr.io/marigold-dev/tezos-snapshot-downloader:latest
+            ghcr.io/marigold-dev/tezos-snapshot-downloader:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}
 
       - name: Build and push tezos Storage Upgrader
         id: docker_build_tezos_storage_upgrader
@@ -86,4 +94,5 @@ jobs:
           tags: |
             ghcr.io/marigold-dev/tezos-storage-upgrader:${{ env.VERSION }}
             ghcr.io/marigold-dev/tezos-storage-upgrader:latest
+            ghcr.io/marigold-dev/tezos-storage-upgrader:${{ steps.vars.outputs.date }}-${{ steps.vars.outputs.sha_short }}
 
