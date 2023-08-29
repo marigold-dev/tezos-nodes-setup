@@ -57,6 +57,9 @@ cat << EOF > ${node_dir}/data/config.json
         ]
     },
   "p2p":{
+    "bootstrap-peers": [ "boot.tzboot.net", "boot.tzbeta.net",
+          "boot.mainnet.oxheadhosted.com" ],
+    "listen-addr": "[::]:9732",
     "limits":{
       "connection-timeout":$CONNECTION_TIMEOUT,
       "min-connections":$MIN_CONNECTIONS,
