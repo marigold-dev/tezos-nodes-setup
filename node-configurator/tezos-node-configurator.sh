@@ -57,7 +57,7 @@ cat << EOF > ${node_dir}/data/config.json
         ]
     },
   "p2p":{
-    "listen-addr": ":9732",
+    "listen-addr": ":9732"
   },
   "shell":{
     "chain_validator":{
