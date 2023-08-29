@@ -57,17 +57,7 @@ cat << EOF > ${node_dir}/data/config.json
         ]
     },
   "p2p":{
-    "bootstrap-peers": [ "boot.tzboot.net", "boot.tzbeta.net",
-          "boot.mainnet.oxheadhosted.com" ],
-    "listen-addr": "[::]:9732",
-    "limits":{
-      "connection-timeout":$CONNECTION_TIMEOUT,
-      "min-connections":$MIN_CONNECTIONS,
-      "expected-connections":$EXPECTED_CONNECTIONS,
-      "max-connections":$MAX_CONNECTIONS,
-      "max_known_points":[$MAX_KNOWN_POINTS_MAX, $MAX_KNOWN_POINTS_TARGET],
-      "max_known_peer_ids":[$MAX_KNOWN_PEER_IDS_MAX, $MAX_KNOWN_PEER_IDS_TARGET]
-    }
+    "listen-addr": ":9732",
   },
   "shell":{
     "chain_validator":{
